@@ -1,5 +1,4 @@
-const { User, Application } = require('../models');
-const { findOne, findOneAndUpdate } = require('../models/User');
+const { User } = require('../models');
 
 module.exports = {
     getUsers(req, res) {
