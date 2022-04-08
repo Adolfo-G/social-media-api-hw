@@ -1,4 +1,5 @@
 const { User, Application } = require('../models');
+const { findOne, findOneAndUpdate } = require('../models/User');
 
 module.exports = {
     getUsers(req, res) {
@@ -48,5 +49,26 @@ module.exports = {
                     : res.json(user)
             )
             .catch((err) => res.status(500).json(err));
-    }
+    },
+    addNewFriend(req, res) {
+        User.findOneAndUpdate({ _id: req.params.userId }, { $push: { friends: req.params.friendId } }, { new: true })
+            .then((user) =>
+                res.json(user)
+            )
+            .catch((err) => res.status(500).json(err));
+    },
+    deleteFriend(req, res) {
+        User.updateOne({ _id: req.params.userId }, {
+            $pull: {
+                friends: req.params.friendId
+            }
+        })
+            .then((user) =>
+                res.json(user)
+            )
+            .catch((err) => {
+                console.log(err);
+                res.status(500).json(err);
+            })
+    },
 }
