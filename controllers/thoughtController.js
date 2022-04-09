@@ -39,16 +39,24 @@ module.exports = {
             )
             .catch((err) => res.status(500).json(err));
     },
-    async deleteThought(req, res) {
+    deleteThought(req, res) {
         Thought.findOneAndRemove({ _id: req.params.thoughtId })
-            .then(() => {
-                return User.updateMany({ thoughts: req.params.thoughtId },
-                    { $pull: { thoughts: req.params.thoughtId } },
-                    { new: true })
-            })
-            .then(() =>
-                res.json({ message: 'thought deleted' })
+            .then((thought) =>
+                !thought
+                    ? res.status(404).json({ message: 'No application with this id!' })
+                    : User.findOneAndUpdate(
+                        { thoughts: req.params.thoughtId },
+                        { $pull: { thoughts: req.params.thoughtId } },
+                        { new: true })
             )
+            .then((user) =>
+                !user
+                    ? res.status(404).json({
+                        message: 'No user with this id!',
+                    })
+                    : res.json({ message: 'Thought successfully deleted!' })
+            )
+            .catch((err) => res.status(500).json(err));
     },
     updateThought(req, res) {
         Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $set: req.body }, { new: true })
